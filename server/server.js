@@ -6,7 +6,7 @@ const XLSX = require("xlsx");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const EXCEL_PATH = path.join(__dirname, "feedback.xlsx");
+const EXCEL_PATH = path.join(__dirname, "../data/feedback.xlsx");
 
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "../public")));
@@ -29,6 +29,18 @@ app.post("/submit", (req, res) => {
   XLSX.writeFile(newWB, EXCEL_PATH);
 
   res.sendStatus(200);
+});
+
+app.get("/feedback-view", (req, res) => {
+  res.sendFile(path.join(__dirname, "../public/feedback-list.html"));
+});
+
+app.get("/feedback-list", (req, res) => {
+  if (!fs.existsSync(EXCEL_PATH)) return res.json([]);
+  const workbook = XLSX.readFile(EXCEL_PATH);
+  const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+  const data = XLSX.utils.sheet_to_json(worksheet);
+  res.json(data);
 });
 
 app.listen(PORT, () => {

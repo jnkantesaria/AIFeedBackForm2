@@ -7,6 +7,7 @@ A simple feedback form with validation and Excel data storage.
 - HTML frontend with star rating
 - Node.js backend with Express
 - Saves feedback to Excel file
+- Feedback viewer page
 
 ## To Run Locally
 
