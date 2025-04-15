@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Feedback Form</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; }
+    input, textarea { width: 100%; padding: 8px; }
+    .stars span { font-size: 24px; cursor: pointer; color: lightgray; }
+    .stars span.selected { color: gold; }
+  </style>
+</head>
+<body>
+  <h1>Feedback Form</h1>
+  <form id="feedbackForm">
+    <div class="form-group">
+      <label>Full Name *</label>
+      <input type="text" id="fullName" required>
+    </div>
+    <div class="form-group">
+      <label>Email *</label>
+      <input type="email" id="email" required>
+      <span id="emailError" style="color:red; display:none;">Please enter valid email address</span>
+    </div>
+    <div class="form-group">
+      <label>Feedback *</label>
+      <textarea id="feedback" required></textarea>
+    </div>
+    <div class="form-group">
+      <label>Rating *</label>
+      <div class="stars" id="stars">
+        <span data-value="1">&#9733;</span>
+        <span data-value="2">&#9733;</span>
+        <span data-value="3">&#9733;</span>
+        <span data-value="4">&#9733;</span>
+        <span data-value="5">&#9733;</span>
+        <span id="ratingLabel">(0/5)</span>
+      </div>
+      <input type="hidden" id="rating" required>
+    </div>
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    const stars = document.querySelectorAll(".stars span");
+    const ratingInput = document.getElementById("rating");
+    const ratingLabel = document.getElementById("ratingLabel");
+
+    stars.forEach(star => {
+      star.addEventListener("click", () => {
+        const value = star.dataset.value;
+        ratingInput.value = value;
+        ratingLabel.textContent = `(${value}/5)`;
+        stars.forEach(s => s.classList.remove("selected"));
+        stars.forEach(s => {
+          if (s.dataset.value <= value) s.classList.add("selected");
+        });
+      });
+    });
+
+    document.getElementById("feedbackForm").addEventListener("submit", async e => {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value;
+      const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      if (!emailValid) {
+        document.getElementById("emailError").style.display = "inline";
+        return;
+      } else {
+        document.getElementById("emailError").style.display = "none";
+      }
+
+      const data = {
+        fullName: document.getElementById("fullName").value,
+        email,
+        feedback: document.getElementById("feedback").value,
+        rating: ratingInput.value
+      };
+
+      const res = await fetch("/submit", {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      if (res.ok) {
+        alert("Feedback submitted!");
+        document.getElementById("feedbackForm").reset();
+        stars.forEach(s => s.classList.remove("selected"));
+        ratingLabel.textContent = "(0/5)";
+      } else {
+        alert("Submission failed.");
+      }
+    });
+  </script>
+</body>
+</html>
