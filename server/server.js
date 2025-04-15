@@ -6,7 +6,7 @@ const XLSX = require("xlsx");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const EXCEL_PATH = path.join(__dirname, "../data/feedback.xlsx");
+const EXCEL_PATH = path.join(__dirname, "feedback.xlsx");
 
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "../public")));
